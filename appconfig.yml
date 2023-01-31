@@ -1,0 +1,8 @@
+apps:
+  appInstaller:
+    app_icon: ''
+    type: streamlit
+    config:
+      entry_file: appInstaller.py
+      env: {}
+      cli_args: []
