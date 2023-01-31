@@ -1,6 +1,6 @@
 apps:
   appInstaller:
-    app_icon: ''
+    app_icon: 'appInstaller_logo.png'
     type: streamlit
     config:
       entry_file: appInstaller.py
