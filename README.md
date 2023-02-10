@@ -1,8 +1,6 @@
 [![FloWide](https://flowide.net/wp-content/uploads/2022/06/fw-logo.svg "Go to FloWide webpage")](https://flowide.net)
 
-# Dummy Public App
+# FloWide App Installer
 
 
-This application can be run with streamlit on the `FloWide` workbench.
-
-It writes out a basic text.
+This application will be pre-installed for all users on the FloWide Workbench. Its purpose is to install apps from the FloWide-Apps organization on GitHub.
