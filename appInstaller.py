@@ -25,7 +25,7 @@ def rqgetAuth(url, token):
 
 # POST request with token and error handling
 def rqpostAuth(url, token, data):
-    rv = rq.post(url, headers={'Authorization': 'Bearer ' + token}, data = data)
+    rv = rq.post(url, headers={'Authorization': 'Bearer ' + token}, data=data)
     if rv.status_code < 200 or rv.status_code >= 300:
         st.error('HTTP request failed!')
         st.write('*Additional information for the error:* ', rv.json())
@@ -75,10 +75,22 @@ for repo in flowideAppsReposList:
             lrif = lr.get('imported_from', '')
             if lrif == repo.clone_url:
                 installedAs = lr['name']
+                installedAsId = lr['git_service_id']
                 break
         # display as installed
         if installedAs:
             st.write('**INSTALLED** as ', installedAs)
+            # check for updates
+            githubTags = repo.get_tags()   # get github tags
+            if githubTags.totalCount > 0:   # github tag(s) available
+                localTags = rqgetAuth(f'{SCRIPTHANDLER_ADDRESS}/repo/{installedAsId}/git/tags', token)  # get local tags            
+                lgtPresent = False
+                for t in localTags:
+                    if str(githubTags[0].commit.sha) == t['commit']:   # local tag equals with the last tag on github
+                        lgtPresent = True   # last GitHub tag presents locally
+                        break
+                if not lgtPresent:
+                    st.info('A new version is available: ' + githubTags[0].name)
         # offer to install
         else:
             # release selection
