@@ -3,13 +3,14 @@ import os
 import requests as rq
 import json
 from github import Github
+from urllib.parse import parse_qs
 
 
 # ############## CONFIGURATION ################
 FLOWIDEAPPS_ORG = 'FloWide-Apps'
-# KEYCLOAK_ADDRESS = 'http://keycloak'
+KEYCLOAK_ADDRESS = 'http://keycloak'
 SCRIPTHANDLER_ADDRESS = 'http://script_handler'
-server = os.environ['SERVER']
+SERVER = os.environ['SERVER']
 # #############################################
 
 
@@ -33,20 +34,23 @@ def rqpostAuth(url, token, data):
     return rv.json()
 
 
+def getGithubToken(keycloak_token: str):
+    resp = rq.get(f"{KEYCLOAK_ADDRESS}/auth/realms/{SERVER}-gw/broker/github/token", headers={"Authorization": f"Bearer {keycloak_token}"})
+    if resp.status_code != 200:
+        return None
+    parsed_data = parse_qs(resp.text, strict_parsing=False)
+    if 'access_token' not in parsed_data:
+        return None
+    if len(parsed_data['access_token']) == 0:
+        return None
+    return parsed_data['access_token'][0]
+
+
 st.title('FloWide App Installer')
-st.write(f'Current server: **{server}**')
+st.write(f'Current server: **{SERVER}**')
 
 token = st.experimental_get_query_params()['token'][0]   # get keycloak token
-# userinfo_endpoint = (rq.get(f'{KEYCLOAK_ADDRESS}/auth/realms/{server}-gw/.well-known/openid-configuration').json())['userinfo_endpoint']
-# userinfo = rqgetAuth(userinfo_endpoint, token)
-# if 'github_token' in userinfo and 'token' in userinfo['github_token']:
-#     githubToken = userinfo['github_token']['token']
-# else:
-#     githubToken = None
-
-githubToken = st.text_input('GitHub token to access also private apps')
-if githubToken == '':
-    githubToken = None
+githubToken = getGithubToken(token)
 
 with st.spinner('Collecting data...'):
 
