@@ -4,7 +4,7 @@ import requests as rq
 import json
 from github import Github
 from urllib.parse import parse_qs
-
+import re
 
 # ############## CONFIGURATION ################
 FLOWIDEAPPS_ORG = 'FloWide-Apps'
@@ -68,8 +68,14 @@ with st.spinner('Collecting data...'):
     # get current repos from workbench
     localReposList = rqgetAuth(f'{SCRIPTHANDLER_ADDRESS}/repo', token)
 
+
+search_param = st.text_input('Search')
+
 # check for already installed apps
 for repo in flowideAppsReposList:
+    if search_param and not re.match(fr".*{search_param}.*", repo.name):
+        continue
+
     with st.expander(repo.name, expanded=True):
         st.write(repo.html_url)
         st.write(repo.description)
